@@ -2,6 +2,7 @@ require_relative 'knowledge'
 
 class Parser
 
+	#the array of words the parser is working on
 	@@words = nil
 	
 	def Parser.parse(input)
@@ -23,38 +24,44 @@ class Parser
 	end
 
 	def Parser.parseIs(wordPos)
-		if (wordPos < @@words.length - 1)
-			nextWord = getNextWords(wordPos + 1, 1)
+		nextWord = getNextWords(wordPos, 1)
 
-			case nextWord.join.downcase 
-				when 'a', 'an'
-					source = getPreviousWords(wordPos - 1, 1)
-					target = getNextWords(wordPos + 2, 1) 
+		case nextWord.join.downcase 
+			when 'a', 'an'
+				source = getPreviousWords(wordPos, 1)
+				target = getNextWords(wordPos + 1, 1) 
 
-					unless (source.empty? || target.empty?)
-						puts 'You are saying that ' + source[0] + ' is a type of ' + target[0] + '?'
-						answer = gets.strip.downcase
-						
-						if (answer == 'y' || answer == 'yes')
-							Knowledge.store(source, 'is a', target);
-						else
-							puts 'OK, I will disregard that then'
-						end
+				unless (source.empty? || target.empty?)
+					puts 'You are saying that ' + source[0] + ' is a type of ' + target[0] + '?'
+					answer = gets.strip.downcase
+					
+					if (answer == 'y' || answer == 'yes')
+						Knowledge.store(source, 'is a', target);
 					else
-						puts 'Something went wrong'
-					end	
-			end	
-		end		
+						puts 'OK, I will disregard that then'
+					end
+				else
+					puts 'Something went wrong'
+				end	
+		end	
 	end
 
 	def Parser.getWord(wordPos)
-		return @@words[wordPos]
+		if (wordPos < 0 || wordPos >= @@words.length)
+			return nil
+		else
+			return @@words[wordPos]
+		end
 	end
 
-	def Parser.getPreviousWords(startPos, wordCount)
+	#currentPos: the word to get words previous to
+	#wordCount: how many words to get
+	#
+	#return: array of strings
+	def Parser.getPreviousWords(currentPos, wordCount)
 		snippet = Array.new
 		wordCounter = 0
-		currentWordPos = startPos
+		currentWordPos = currentPos - 1
 
 		until wordCounter == wordCount || currentWordPos == -1
 			snippet.push(@@words[currentWordPos])
@@ -65,10 +72,14 @@ class Parser
 		return snippet
 	end
 
-	def Parser.getNextWords(startPos, wordCount)
+	#currentPos: the word to get words after
+	#wordCount: how many words to get
+	#
+	#return: array of strings
+	def Parser.getNextWords(currentPos, wordCount)
 		snippet = Array.new
 		wordCounter = 0
-		currentWordPos = startPos
+		currentWordPos = currentPos + 1
 		
 		until wordCounter == wordCount || currentWordPos >= @@words.length 
 			snippet.push(@@words[currentWordPos])
