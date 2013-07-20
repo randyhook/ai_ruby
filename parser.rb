@@ -8,7 +8,7 @@ class Parser
 		:unknown => 'unknown'
 	}
 
-	@@ignoreWords = ['is', 'a', 'an', 'the'];
+	@@ignoreWords = ['a', 'an', 'is', 'the', 'what'];
 
 	#the sentence type of the sentence the parser is working on
 	@@sentenceType = nil
@@ -28,7 +28,7 @@ class Parser
 		
 		case @@sentenceType
 			when @@sentenceTypes[:question]
-				Knowledge.ask(Parser.parseQuestion())
+				Knowledge.ask(@@words[0].downcase(), Parser.parseQuestion())
 			else
 				for w in @@words
 					currentWord = Parser.getWord(wordCounter)
