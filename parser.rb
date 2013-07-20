@@ -2,6 +2,16 @@ require_relative 'knowledge'
 
 class Parser
 
+	@@sentenceTypes = { 
+		:statement => 'statement',
+		:question => 'question',
+		:unknown => 'unknown'
+	}
+
+	@@ignoreWords = ['is', 'a', 'an', 'the'];
+
+	#the sentence type of the sentence the parser is working on
+	@@sentenceType = nil
 	#the array of words the parser is working on
 	@@words = nil
 	
@@ -10,17 +20,47 @@ class Parser
 		@@words = input.split(' ')
 		wordCounter = 0
 		
-		for w in @@words
-			currentWord = Parser.getWord(wordCounter);
+		@@sentenceType = Parser.setSentenceType()
+		
+		case @@sentenceType
+			when @@sentenceTypes[:question]
+				Knowledge.ask(Parser.parseQuestion())
+			else
+				for w in @@words
+					currentWord = Parser.getWord(wordCounter)
 
-			case currentWord.downcase
-				when 'is'
-					Parser.parseIs(wordCounter)
+					case currentWord.downcase
+						when 'is'
+							Parser.parseIs(wordCounter)
+					end
+
+					wordCounter += 1
+				end
+		end
+	end
+
+	def Parser.setSentenceType()
+		lastWord = @@words.last
+
+		case lastWord[lastWord.length - 1]
+			when '?'
+				@@sentenceType = @@sentenceTypes[:question]
+			else
+				@@sentenceType = @@sentenceTypes[:unknown]	
+		end
+	end
+
+	def Parser.parseQuestion()
+		concepts = Array.new
+
+		for word in @@words
+			word.chomp!('?')
+			unless (@@ignoreWords.include?(word))
+				concepts.push(word)
 			end
-
-			wordCounter += 1
 		end
 
+		return concepts
 	end
 
 	def Parser.parseIs(wordPos)
@@ -36,7 +76,7 @@ class Parser
 					answer = gets.strip.downcase
 					
 					if (answer == 'y' || answer == 'yes')
-						Knowledge.store(source, 'is a', target);
+						Knowledge.store(source, 'is a', target)
 					else
 						puts 'OK, I will disregard that then'
 					end
