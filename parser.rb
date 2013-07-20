@@ -17,7 +17,7 @@ class Parser
 	
 	def Parser.parse(input)
 
-		if (input == 'goodbye')
+		if (input == 'no')
 			return input
 		end
 
@@ -28,7 +28,7 @@ class Parser
 		
 		case @@sentenceType
 			when @@sentenceTypes[:question]
-				Knowledge.ask(@@words[0].downcase(), Parser.parseQuestion())
+				Parser.parseQuestion()
 			else
 				for w in @@words
 					currentWord = Parser.getWord(wordCounter)
@@ -57,16 +57,31 @@ class Parser
 	end
 
 	def Parser.parseQuestion()
-		concepts = Array.new
+		sources = Array.new
+		targets = Array.new
+
+		currentWordType = :ignore
 
 		for word in @@words
 			word.chomp!('?')
+
 			unless (@@ignoreWords.include?(word))
-				concepts.push(word)
+				if (currentWordType == :ignore || currentWordType == :source)
+					sources.push(word)
+					currentWordType = :source
+				else
+					targets.push(word)
+				end
+			else
+				if (currentWordType == :source)
+					currentWordType = :target
+				end
 			end
 		end
 
-		return concepts
+		Knowledge.ask(@@words[0], sources, targets, 3);
+
+		return nil
 	end
 
 	def Parser.parseIs(wordPos)

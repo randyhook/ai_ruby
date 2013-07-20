@@ -5,12 +5,15 @@ class Knowledge
 
 	BASE_URI = 'http://conceptnet5.media.mit.edu/data/5.1/'
 	
-	def Knowledge.ask(questionType, concepts)
+	def Knowledge.ask(questionType, sources, targets, limit = 1)
+		sourceString = sources.join(',');
+		targetString = targets.join(',');
+
 		case questionType
 			when 'is'
-				uri = 'search?start=' + concepts[0] + '&rel=/r/IsA&end=' + concepts[1]
+				uri = 'search?startLemmas=' + sourceString + '&rel=/r/IsA&endLemmas=' + targetString
 			when 'what'
-				uri = 'search?start=' + concepts[0] + '&minWeight=1&limit=1'
+				uri = 'search?startLemmas=' + sourceString + '&rel=/r/IsA&minWeight=1&limit=' + limit.to_s()
 			else
 				uri = nil
 		end
@@ -28,8 +31,16 @@ class Knowledge
 				if (result['numFound'] == 0)
 					output = 'I have no idea.'
 				else
+					output = ''
+					edgeCounter = 0
 					result['edges'].each { |edge|
-						output = edge['end']
+						if (edgeCounter > 0)
+							output += " or\n"
+						end
+
+						output += edge['startLemmas']
+						
+						edgeCounter += 1
 					}
 				end
 			else
