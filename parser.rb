@@ -17,6 +17,10 @@ class Parser
 	
 	def Parser.parse(input)
 
+		if (input == 'goodbye')
+			return input
+		end
+
 		@@words = input.split(' ')
 		wordCounter = 0
 		
@@ -37,6 +41,8 @@ class Parser
 					wordCounter += 1
 				end
 		end
+
+		return input
 	end
 
 	def Parser.setSentenceType()

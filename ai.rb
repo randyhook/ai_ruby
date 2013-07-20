@@ -1,5 +1,5 @@
 require_relative 'interact'
 
-Interact.askForInput
-Interact.getInput
+while Interact.askForInput != 'goodbye'
+end
 

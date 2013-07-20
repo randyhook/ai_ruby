@@ -5,12 +5,10 @@ class Interact
 	@@currentInput = nil
 
 	def Interact.askForInput
-		puts 'What can I do for you?'
-	end
+		puts 'How may I be of service?'
 
-	def Interact.getInput
 		@@currentInput = gets.strip
-		Parser.parse(@@currentInput)
+		return Parser.parse(@@currentInput)
 	end
 
 end
